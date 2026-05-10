@@ -3,12 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package obligatorio1p2.modelo;
+
 import java.util.Arrays;
+
 /**
  *
  * @author Camila
  */
 public class Tablero {
+
     private char[][] matriz = new char[8][10];
 
     public Tablero() {
@@ -41,6 +44,25 @@ public class Tablero {
             copiaMatriz[i] = Arrays.copyOf(matriz[i], matriz[i].length);
         }
         return copiaMatriz;
+    }
+
+    //Caso 1: contarFichas
+    public int contarFichas(char color) {
+
+        int cantidad = 0;
+
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                
+                if (matriz[i][j] == color) {
+                    cantidad ++;
+                }
+
+            }
+
+        }
+        return cantidad;
+
     }
 
     // Caso 2: validar movimiento individual
@@ -181,5 +203,5 @@ public class Tablero {
         }
         return tableroPreparado.toString();
     }
-    
+
 }
