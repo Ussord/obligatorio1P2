@@ -53,9 +53,9 @@ public class Tablero {
 
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
-                
+
                 if (matriz[i][j] == color) {
-                    cantidad ++;
+                    cantidad++;
                 }
 
             }
@@ -171,6 +171,150 @@ public class Tablero {
         return valido;
     }
 
+    // Caso 3: validar movimiento en grupo
+    public boolean validarMovimientoEnGrupo(char color, String forma, String sentido,
+            int fila, int columna, int tamanio, int pasos) {
+
+        boolean valido = true;
+        int cambioFila = 0;
+        int cambioColumna = 0;
+
+        // Validamos color.
+        if (color != 'B' && color != 'N') {
+            valido = false;
+        }
+
+        // Validamos forma.
+        if (valido && !(forma.equals("H") || forma.equals("V"))) {
+            valido = false;
+        }
+
+        // Validamos sentido.
+        if (valido && !(sentido.equals("N") || sentido.equals("S")
+                || sentido.equals("E") || sentido.equals("O"))) {
+            valido = false;
+        }
+
+        // Validamos datos numéricos y posición inicial.
+        if (valido && (tamanio <= 0 || pasos <= 0 || fila < 0 || fila >= matriz.length
+                || columna < 0 || columna >= matriz[0].length)) {
+            valido = false;
+        }
+
+        // Validamos sentido según forma del grupo.
+        if (valido && forma.equals("H") && !(sentido.equals("N") || sentido.equals("S"))) {
+            valido = false;
+        }
+
+        if (valido && forma.equals("V") && !(sentido.equals("E") || sentido.equals("O"))) {
+            valido = false;
+        }
+
+        // Validamos sentido según color.
+        if (valido && color == 'B' && sentido.equals("S")) {
+            valido = false;
+        }
+
+        if (valido && color == 'N' && sentido.equals("N")) {
+            valido = false;
+        }
+
+        // Convertimos el sentido en cambios de fila y columna.
+        if (valido) {
+            if (sentido.equals("N")) {
+                cambioFila = -1;
+            }
+            if (sentido.equals("S")) {
+                cambioFila = 1;
+            }
+            if (sentido.equals("E")) {
+                cambioColumna = 1;
+            }
+            if (sentido.equals("O")) {
+                cambioColumna = -1;
+            }
+        }
+
+        // Validamos que el grupo exista completo y sea del color indicado.
+        for (int pos = 0; pos < tamanio && valido; pos = pos + 1) {
+            int filaFicha = fila;
+            int columnaFicha = columna;
+
+            if (forma.equals("H")) {
+                columnaFicha = columna + pos;
+            } else {
+                filaFicha = fila + pos;
+            }
+
+            if (filaFicha < 0 || filaFicha >= matriz.length
+                    || columnaFicha < 0 || columnaFicha >= matriz[0].length) {
+                valido = false;
+            } else {
+                if (matriz[filaFicha][columnaFicha] != color) {
+                    valido = false;
+                }
+            }
+        }
+
+        // Validamos camino libre y posiciones finales vacías.
+        for (int pos = 0; pos < tamanio && valido; pos = pos + 1) {
+            int filaFicha = fila;
+            int columnaFicha = columna;
+
+            if (forma.equals("H")) {
+                columnaFicha = columna + pos;
+            } else {
+                filaFicha = fila + pos;
+            }
+
+            for (int paso = 1; paso <= pasos && valido; paso = paso + 1) {
+                int filaActual = filaFicha + cambioFila * paso;
+                int columnaActual = columnaFicha + cambioColumna * paso;
+
+                if (filaActual < 0 || filaActual >= matriz.length
+                        || columnaActual < 0 || columnaActual >= matriz[0].length) {
+                    valido = false;
+                } else {
+                    if (matriz[filaActual][columnaActual] != 'V') {
+                        valido = false;
+                    }
+                }
+            }
+        }
+
+        // Si todo fue válido, modificamos el tablero.
+        if (valido) {
+            for (int pos = 0; pos < tamanio; pos = pos + 1) {
+                int filaFicha = fila;
+                int columnaFicha = columna;
+
+                if (forma.equals("H")) {
+                    columnaFicha = columna + pos;
+                } else {
+                    filaFicha = fila + pos;
+                }
+
+                matriz[filaFicha][columnaFicha] = 'V';
+            }
+
+            for (int pos = 0; pos < tamanio; pos = pos + 1) {
+                int filaFicha = fila;
+                int columnaFicha = columna;
+
+                if (forma.equals("H")) {
+                    columnaFicha = columna + pos;
+                } else {
+                    filaFicha = fila + pos;
+                }
+
+                matriz[filaFicha + cambioFila * pasos][columnaFicha + cambioColumna * pasos] = color;
+            }
+        }
+
+        return valido;
+    }
+    //Caso 4 Preparar Tablero
+
     public String prepararTablero() {
         StringBuilder tableroPreparado = new StringBuilder();
         String filaSeparadora = "+---+---+---+---+---+---+---+---+---+---+";
@@ -202,6 +346,58 @@ public class Tablero {
             }
         }
         return tableroPreparado.toString();
+    }
+    //Caso 5 Verificar conexion 
+
+    public boolean verificarConexion(char color) {
+        boolean[][] visitado = new boolean[8][10];
+        boolean encontrePrimera = false;
+        int filaInicio = -1;
+        int columnaInicio = -1;
+
+        for (int i = 0; i < matriz.length && !encontrePrimera; i++) {
+            for (int j = 0; j < matriz[i].length && !encontrePrimera; j++) {
+                if (matriz[i][j] == color) {
+                    filaInicio = i;
+                    columnaInicio = j;
+                    encontrePrimera = true;
+                }
+            }
+        }
+
+        boolean conectado = encontrePrimera;
+
+        if (conectado) {
+            recorrerConectadas(color, filaInicio, columnaInicio, visitado);
+
+            for (int i = 0; i < matriz.length && conectado; i++) {
+                for (int j = 0; j < matriz[i].length && conectado; j++) {
+                    if (matriz[i][j] == color && !visitado[i][j]) {
+                        conectado = false;
+                    }
+                }
+            }
+        }
+
+        return conectado;
+    }
+
+    private void recorrerConectadas(char color, int fila, int columna, boolean[][] visitado) {
+        if (fila >= 0 && fila < matriz.length
+                && columna >= 0 && columna < matriz[0].length
+                && !visitado[fila][columna]
+                && matriz[fila][columna] == color) {
+
+            visitado[fila][columna] = true;
+
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    if (!(i == 0 && j == 0)) {
+                        recorrerConectadas(color, fila + i, columna + j, visitado);
+                    }
+                }
+            }
+        }
     }
 
 }
