@@ -6,6 +6,8 @@ package obligatorio1p2.modelo;
 
 import java.util.Arrays;
 
+import obligatorio1p2.modelo.Validaciones;
+
 /**
  *
  * @author Camila
@@ -51,15 +53,18 @@ public class Tablero {
 
         int cantidad = 0;
 
-        for (int i = 0; i < matriz.length; i++) {
-            for (int j = 0; j < matriz[i].length; j++) {
+        if (Validaciones.validarColor(color)) {
 
-                if (matriz[i][j] == color) {
-                    cantidad++;
+            for (int i = 0; i < matriz.length; i++) {
+                for (int j = 0; j < matriz[i].length; j++) {
+
+                    if (matriz[i][j] == color) {
+                        cantidad++;
+                    }
+
                 }
 
             }
-
         }
         return cantidad;
 
@@ -75,8 +80,7 @@ public class Tablero {
         int columnaFinal = columna;
         char colorOpuesto = 'B';
 
-        // Validamos que el color sea uno de los permitidos.
-        if (color != 'B' && color != 'N') {
+        if (!Validaciones.validarColor(color)) {
             valido = false;
         }
 
@@ -86,16 +90,12 @@ public class Tablero {
         }
 
         // Validamos que el sentido sea uno de los permitidos.
-        if (valido && !(sentido.equals("N") || sentido.equals("S")
-                || sentido.equals("E") || sentido.equals("O")
-                || sentido.equals("NE") || sentido.equals("NO")
-                || sentido.equals("SE") || sentido.equals("SO"))) {
+        if (valido && !Validaciones.validarSentidoIndividual(sentido)) {
             valido = false;
         }
 
         // Validamos pasos y posición inicial.
-        if (valido && (pasos <= 0 || fila < 0 || fila >= matriz.length
-                || columna < 0 || columna >= matriz[0].length)) {
+        if (valido && (!Validaciones.validarPasos(pasos) || !Validaciones.validarPosicion(fila, columna))) {
             valido = false;
         }
 
@@ -121,16 +121,7 @@ public class Tablero {
         }
 
         // Validamos que las blancas no retrocedan.
-        if (valido && color == 'B'
-                && !(sentido.equals("N") || sentido.equals("NE") || sentido.equals("NO")
-                || sentido.equals("E") || sentido.equals("O"))) {
-            valido = false;
-        }
-
-        // Validamos que las negras no retrocedan.
-        if (valido && color == 'N'
-                && !(sentido.equals("S") || sentido.equals("SE") || sentido.equals("SO")
-                || sentido.equals("E") || sentido.equals("O"))) {
+        if (valido && !Validaciones.validarSentidoSegunColor(color, sentido)) {
             valido = false;
         }
 
@@ -141,8 +132,7 @@ public class Tablero {
         }
 
         // Validamos que la posición final esté dentro del tablero.
-        if (valido && (filaFinal < 0 || filaFinal >= matriz.length
-                || columnaFinal < 0 || columnaFinal >= matriz[0].length)) {
+        if (valido && !Validaciones.validarPosicion(filaFinal, columnaFinal)) {
             valido = false;
         }
 
@@ -179,8 +169,7 @@ public class Tablero {
         int cambioFila = 0;
         int cambioColumna = 0;
 
-        // Validamos color.
-        if (color != 'B' && color != 'N') {
+        if (!Validaciones.validarColor(color)) {
             valido = false;
         }
 
@@ -190,14 +179,12 @@ public class Tablero {
         }
 
         // Validamos sentido.
-        if (valido && !(sentido.equals("N") || sentido.equals("S")
-                || sentido.equals("E") || sentido.equals("O"))) {
+        if (valido && !Validaciones.validarSentidoGrupo(sentido)) {
             valido = false;
         }
 
         // Validamos datos numéricos y posición inicial.
-        if (valido && (tamanio <= 0 || pasos <= 0 || fila < 0 || fila >= matriz.length
-                || columna < 0 || columna >= matriz[0].length)) {
+        if (valido && (tamanio <= 0 || !Validaciones.validarPasos(pasos) || !Validaciones.validarPosicion(fila, columna))) {
             valido = false;
         }
 
@@ -211,11 +198,7 @@ public class Tablero {
         }
 
         // Validamos sentido según color.
-        if (valido && color == 'B' && sentido.equals("S")) {
-            valido = false;
-        }
-
-        if (valido && color == 'N' && sentido.equals("N")) {
+        if (valido && !Validaciones.validarSentidoSegunColor(color, sentido)) {
             valido = false;
         }
 
@@ -246,8 +229,7 @@ public class Tablero {
                 filaFicha = fila + pos;
             }
 
-            if (filaFicha < 0 || filaFicha >= matriz.length
-                    || columnaFicha < 0 || columnaFicha >= matriz[0].length) {
+            if (!Validaciones.validarPosicion(filaFicha, columnaFicha)) {
                 valido = false;
             } else {
                 if (matriz[filaFicha][columnaFicha] != color) {
@@ -271,8 +253,7 @@ public class Tablero {
                 int filaActual = filaFicha + cambioFila * paso;
                 int columnaActual = columnaFicha + cambioColumna * paso;
 
-                if (filaActual < 0 || filaActual >= matriz.length
-                        || columnaActual < 0 || columnaActual >= matriz[0].length) {
+                if (!Validaciones.validarPosicion(filaActual, columnaActual)) {
                     valido = false;
                 } else {
                     if (matriz[filaActual][columnaActual] != 'V') {
@@ -350,6 +331,11 @@ public class Tablero {
     //Caso 5 Verificar conexion 
 
     public boolean verificarConexion(char color) {
+
+        if (!Validaciones.validarColor(color)) {
+            return false;
+        }
+
         boolean[][] visitado = new boolean[8][10];
         boolean encontrePrimera = false;
         int filaInicio = -1;

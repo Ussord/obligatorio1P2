@@ -10,15 +10,15 @@ import java.util.ArrayList;
  *
  * @author Camila
  */
-public class Tester { 
-    
+public class Tester {
+
     private String nombre;
     private int edad;
     private int aniosExperiencia;
-    private ArrayList<Testeo> listaTesteos; 
-    
+    private ArrayList<Testeo> listaTesteos;
+
     public Tester() {
-        listaTesteos = new ArrayList<>(); 
+        listaTesteos = new ArrayList<>();
         // Inicializa la lista cuando se crea el tester
     }
 
@@ -45,20 +45,23 @@ public class Tester {
     public void setAniosExperiencia(int aniosExperiencia) {
         this.aniosExperiencia = aniosExperiencia;
     }
-    
-     public ArrayList<Testeo> getListaTesteos() {
+
+    public ArrayList<Testeo> getListaTesteos() {
         return listaTesteos;
     }
 
     public void agregarTesteo(Testeo t) {
-        listaTesteos.add(t); 
+        listaTesteos.add(t);
         // Agrega un testeo a la lista del tester
     }
-    
+
+    public int getCantidadTests() {
+        return listaTesteos.size();
+    }
 
     @Override
     public String toString() {
         return this.getNombre();
     }
-    
+
 }
