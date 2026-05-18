@@ -11,14 +11,6 @@ import java.util.HashSet;
 public class Tablero {
 
     private char[][] matriz = new char[8][10];
-    private static final Set<String> SENTIDOS_BLANCAS = new HashSet<>(
-            Arrays.asList("N", "NE", "NO", "E", "O"));
-    private static final Set<String> SENTIDOS_NEGRAS = new HashSet<>(
-            Arrays.asList("S", "SE", "SO", "E", "O"));
-    private static final Set<String> SENTIDOS_INDIVIDUALES = new HashSet<>(
-            Arrays.asList("N", "S", "E", "O", "NE", "NO", "SE", "SO"));
-    private static final Set<String> SENTIDOS_GRUPO = new HashSet<>(
-            Arrays.asList("N", "S", "E", "O"));
 
     public Tablero() {
         String[] filas = {
@@ -74,15 +66,9 @@ public class Tablero {
         if (matriz[fila][columna] != color) {
             valido = false;
         }
-        if (valido && !validarSentidoIndividual(sentido)) {
-            valido = false;
-        }
         if (valido) {
             cambioFila = obtenerCambioFila(sentido);
             cambioColumna = obtenerCambioColumna(sentido);
-        }
-        if (valido && !validarSentidoSegunColor(color, sentido)) {
-            valido = false;
         }
         if (valido) {
             filaFinal = fila + cambioFila * pasos;
@@ -107,16 +93,10 @@ public class Tablero {
     public boolean validarMovimientoEnGrupo(char color, String forma, String sentido,
             int fila, int columna, int tamanio, int pasos) {
         boolean valido = true;
-        if (!validarSentidoGrupo(sentido)) {
-            valido = false;
-        }
-        if (valido && forma.equals("H") && !(sentido.equals("N") || sentido.equals("S"))) {
+        if (forma.equals("H") && !(sentido.equals("N") || sentido.equals("S"))) {
             valido = false;
         }
         if (valido && forma.equals("V") && !(sentido.equals("E") || sentido.equals("O"))) {
-            valido = false;
-        }
-        if (valido && !validarSentidoSegunColor(color, sentido)) {
             valido = false;
         }
         if (valido) {
@@ -200,18 +180,6 @@ public class Tablero {
 
     private boolean validarPosicionFinal(int fila, int columna) {
         return fila >= 0 && fila < 8 && columna >= 0 && columna < 10;
-    }
-
-    private boolean validarSentidoSegunColor(char color, String sentido) {
-        return color == 'B' ? SENTIDOS_BLANCAS.contains(sentido) : SENTIDOS_NEGRAS.contains(sentido);
-    }
-
-    private boolean validarSentidoIndividual(String sentido) {
-        return SENTIDOS_INDIVIDUALES.contains(sentido);
-    }
-
-    private boolean validarSentidoGrupo(String sentido) {
-        return SENTIDOS_GRUPO.contains(sentido);
     }
 
     private int obtenerCambioFila(String sentido) {

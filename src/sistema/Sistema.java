@@ -1,17 +1,33 @@
 package sistema;
 
-
 import java.util.List;
 import modelo.Tablero;
 import modelo.Tester;
 import java.util.Scanner;
+import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Map;
+import modelo.Testeo;
+import java.util.Arrays;
 
 public class Sistema {
 
     private static List<Tester> listaTesters;
     private static Tablero tableroActual;
-    private static int contadorTesteos;
     private static Scanner scanner = new Scanner(System.in);
+    private static final Set<String> COLORES_VALIDOS = new HashSet<>(Arrays.asList("B", "N"));
+    private static final Set<String> FORMAS_VALIDAS = new HashSet<>(Arrays.asList("H", "V"));
+    private static final Set<String> SENTIDOS_INDIVIDUALES = new HashSet<>(Arrays.asList("N", "S", "E", "O", "NE", "NO", "SE", "SO"));
+    private static final Set<String> SENTIDOS_GRUPO = new HashSet<>(Arrays.asList("N", "S", "E", "O"));
+    private static final Map<String, Set<String>> SENTIDOS_POR_COLOR = new HashMap<>();
+
+    static {
+        SENTIDOS_POR_COLOR.put("B", new HashSet<>(Arrays.asList("N", "NE", "NO", "E", "O")));
+        SENTIDOS_POR_COLOR.put("N", new HashSet<>(Arrays.asList("S", "SE", "SO", "E", "O")));
+    }
 
     @SuppressWarnings("java:S106")
     public static void main(String[] args) {
@@ -67,6 +83,7 @@ public class Sistema {
             return;
         }
         listaTesters.add(new Tester(nombre, edad, aniosExperiencia));
+        listaTesters.sort(Comparator.comparing(Tester::getNombre));
     }
 
     @SuppressWarnings("java:S106")
@@ -108,16 +125,93 @@ public class Sistema {
         return matrizParticular;
     }
 
+    @SuppressWarnings("java:S106")
     private static void registrarTesteo() {
+        if (listaTesters.isEmpty()) {
+            System.out.println("No existen testers registrados.");
+            return;
+        }
+        System.out.println("Elija un tester:");
+        System.out.println(desplegarListaTesters());
+        int testerElegido = scanner.nextInt();
+        scanner.nextLine();
+        if (testerElegido < 1 || testerElegido > listaTesters.size()) {
+            System.out.println("Numero de tester no existente");
+            return;
+        }
+        System.out.println("Elija un caso:");
+        System.out.println(desplegarCasos());
+        int casoElegido = scanner.nextInt();
+        scanner.nextLine();
+        if (casoElegido <= 0 || casoElegido > 5) {
+            System.out.println("Caso elegido no existente");
+            return;
+        }
+        List<String> parametros = pedirParametrosCaso(casoElegido);
+        if (parametros.isEmpty()) {
+            return;
+        }
+        System.out.println("Ingrese comentario:");
+        String comentario = scanner.nextLine().trim();
+        char[][] matrizOriginal = tableroActual.getMatriz();
+        String resultado = ejecutarCaso(casoElegido, parametros);
+        Testeo testRealizado = new Testeo(casoElegido, parametros, comentario, resultado);
+        testRealizado.setMatrizOriginal(matrizOriginal);
+        if ((casoElegido == 2 || casoElegido == 3) && resultado.equals("true")) {
+            testRealizado.setMatrizResultante(tableroActual.getMatriz());
+        }
 
     }
 
     private static List<String> pedirParametrosCaso(int caso) {
-
+        List<String> parametros = new ArrayList<>();
+        switch (caso) {
+            case 1 -> {
+                return pedirParametrosCaso1Y5(parametros);
+            }
+            case 2 -> {
+                return pedirParametrosCaso2(parametros);
+            }
+            case 3 -> {
+                return pedirParametrosCaso3(parametros);
+            }
+            case 5 -> {
+                return pedirParametrosCaso1Y5(parametros);
+            }
+            default -> {
+                return parametros;
+            }
+        }
     }
 
     private static String ejecutarCaso(int caso, List<String> parametros) {
-
+        switch (caso) {
+            case 1:
+                return String.valueOf(tableroActual.contarFichas(parametros.get(0).charAt(0)));
+            case 2:
+                return String.valueOf(tableroActual.validarMovimientoIndividual(parametros.get(0).charAt(0),
+                        parametros.get(1),
+                        Integer.parseInt(parametros.get(2)),
+                        Integer.parseInt(parametros.get(3)),
+                        Integer.parseInt(parametros.get(4))));
+            case 3:
+                return String.valueOf(tableroActual.validarMovimientoEnGrupo(
+                        parametros.get(0).charAt(0),
+                        parametros.get(1),
+                        parametros.get(2),
+                        Integer.parseInt(parametros.get(3)),
+                        Integer.parseInt(parametros.get(4)),
+                        Integer.parseInt(parametros.get(5)),
+                        Integer.parseInt(parametros.get(6))));
+            case 4:
+                return tableroActual.prepararTablero();
+            case 5:
+                return String.valueOf(
+                        tableroActual
+                                .verificarConexion(parametros.get(0).charAt(0)));
+            default:
+                throw new AssertionError();
+        }
     }
 
     private static void consultarTester() {
@@ -126,5 +220,140 @@ public class Sistema {
 
     private static void mostrarEstadisticas() {
 
+    }
+
+    private static String desplegarListaTesters() {
+        StringBuilder listaTestersDesplegada = new StringBuilder();
+        for (int i = 0; i < listaTesters.size(); i++) {
+            listaTestersDesplegada.append((i + 1))
+                    .append(" - ")
+                    .append(listaTesters.get(i).getNombre())
+                    .append("\n");
+        }
+        return listaTestersDesplegada.toString();
+    }
+
+    private static String desplegarCasos() {
+        StringBuilder casosDesplegados = new StringBuilder();
+        casosDesplegados.append("1 - contarFichas\n")
+                .append("2 - validarMovimientoIndividual\n")
+                .append("3 - validarMovimientoEnGrupo\n")
+                .append("4 - prepararTablero\n")
+                .append("5 - verificarConexion\n");
+        return casosDesplegados.toString();
+    }
+
+    @SuppressWarnings("java:S106")
+    private static List<String> pedirParametrosCaso1Y5(List<String> parametros) {
+        System.out.println("Ingrese color (B/N):");
+        String color = scanner.nextLine().trim().toUpperCase();
+        if (!COLORES_VALIDOS.contains(color)) {
+            System.out.println("Color inválido");
+            return new ArrayList<>();
+        }
+        parametros.add(color);
+        return parametros;
+    }
+
+    @SuppressWarnings("java:S106")
+    private static List<String> pedirParametrosCaso2(List<String> parametros) {
+        System.out.println("Ingrese color (B/N):");
+        String color = scanner.nextLine().trim().toUpperCase();
+        if (!COLORES_VALIDOS.contains(color)) {
+            System.out.println("Color inválido");
+            return new ArrayList<>();
+        }
+        parametros.add(color);
+        System.out.println("Ingrese sentido (N/S/E/O/NE/NO/SE/SO):");
+        String sentido = scanner.nextLine().trim().toUpperCase();
+        if (!SENTIDOS_INDIVIDUALES.contains(sentido)) {
+            System.out.println("Sentido inválido");
+            return new ArrayList<>();
+        }
+        if (!SENTIDOS_POR_COLOR.get(color).contains(sentido)) {
+            System.out.println("Sentido inválido para ese color");
+            return new ArrayList<>();
+        }
+        parametros.add(sentido);
+        System.out.println("Ingrese fila:");
+        String fila = scanner.nextLine().trim();
+        if (!fila.matches("[0-7]")) {
+            System.out.println("Fila inválida");
+            return new ArrayList<>();
+        }
+        parametros.add(fila);
+        System.out.println("Ingrese columna:");
+        String columna = scanner.nextLine().trim();
+        if (!columna.matches("\\d")) {
+            System.out.println("Columna inválida");
+            return new ArrayList<>();
+        }
+        parametros.add(columna);
+        System.out.println("Ingrese pasos:");
+        String pasos = scanner.nextLine().trim();
+        if (!pasos.matches("[1-9]")) {
+            System.out.println("Pasos inválidos");
+            return new ArrayList<>();
+        }
+        parametros.add(pasos);
+        return parametros;
+    }
+
+    @SuppressWarnings("java:S106")
+    private static List<String> pedirParametrosCaso3(List<String> parametros) {
+        System.out.println("Ingrese color (B/N):");
+        String color = scanner.nextLine().trim().toUpperCase();
+        if (!COLORES_VALIDOS.contains(color)) {
+            System.out.println("Color inválido");
+            return new ArrayList<>();
+        }
+        parametros.add(color);
+        System.out.println("Ingrese forma (H/V):");
+        String forma = scanner.nextLine().trim().toUpperCase();
+        if (!FORMAS_VALIDAS.contains(forma)) {
+            System.out.println("Forma inválida");
+            return new ArrayList<>();
+        }
+        parametros.add(forma);
+        System.out.println("Ingrese sentido (N/S/E/O):");
+        String sentido = scanner.nextLine().trim().toUpperCase();
+        if (!SENTIDOS_GRUPO.contains(sentido)) {
+            System.out.println("Sentido inválido");
+            return new ArrayList<>();
+        }
+        if (!SENTIDOS_POR_COLOR.get(color).contains(sentido)) {
+            System.out.println("Sentido inválido para ese color");
+            return new ArrayList<>();
+        }
+        parametros.add(sentido);
+        System.out.println("Ingrese fila:");
+        String fila = scanner.nextLine().trim();
+        if (!fila.matches("[0-7]")) {
+            System.out.println("Fila inválida");
+            return new ArrayList<>();
+        }
+        parametros.add(fila);
+        System.out.println("Ingrese columna:");
+        String columna = scanner.nextLine().trim();
+        if (!columna.matches("\\d")) {
+            System.out.println("Columna inválida");
+            return new ArrayList<>();
+        }
+        parametros.add(columna);
+        System.out.println("Ingrese tamaño:");
+        String tamanio = scanner.nextLine().trim();
+        if (!tamanio.matches("[1-9]")) {
+            System.out.println("Tamaño inválido");
+            return new ArrayList<>();
+        }
+        parametros.add(tamanio);
+        System.out.println("Ingrese pasos:");
+        String pasos = scanner.nextLine().trim();
+        if (!pasos.matches("[1-9]")) {
+            System.out.println("Pasos inválidos");
+            return new ArrayList<>();
+        }
+        parametros.add(pasos);
+        return parametros;
     }
 }
