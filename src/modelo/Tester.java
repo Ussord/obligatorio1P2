@@ -7,10 +7,6 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Camila
- */
 public class Tester {
     
     private String nombre;

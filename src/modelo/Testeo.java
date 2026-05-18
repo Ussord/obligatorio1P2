@@ -7,10 +7,6 @@ package modelo;
 import java.util.List;
 import java.util.Arrays;
 
-/**
- *
- * @author Camila
- */
 public class Testeo {
 
     private int numero;
