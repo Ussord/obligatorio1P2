@@ -325,13 +325,13 @@ public class Sistema {
         System.out.println("Testers con mayor cantidad de testeos (" + maximo + "):");
         for (Tester tester : listaTesters) {
             if (tester.obtenerCantidadTesteos() == maximo) {
-                System.out.println("- " + tester.getNombre());
+                System.out.println(tester.toString());
             }
         }
         System.out.println("Testers sin testeos:");
         for (Tester tester : listaTesters) {
             if (tester.obtenerCantidadTesteos() == 0) {
-                System.out.println("- " + tester.getNombre());
+                System.out.println(tester.toString());
             }
         }
     }
