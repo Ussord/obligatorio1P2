@@ -7,6 +7,12 @@ package modelo;
 import java.util.List;
 import java.util.Arrays;
 
+/*
+ * Autores:
+ * Mauro Russo - 300185
+ * Valeria Otegui - 281674
+ */
+
 public class Testeo {
 
     private static int contador = 0;

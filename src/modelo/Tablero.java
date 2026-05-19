@@ -6,6 +6,12 @@ package modelo;
 
 import java.util.Arrays;
 
+/*
+ * Autores:
+ * Mauro Russo - 300185
+ * Valeria Otegui - 281674
+ */
+
 public class Tablero {
 
     private final char[][] matriz;

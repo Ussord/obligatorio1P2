@@ -13,6 +13,12 @@ import java.util.Map;
 import modelo.Testeo;
 import java.util.Arrays;
 
+/*
+ * Autores:
+ * Mauro Russo - 300185
+ * Valeria Otegui - 281674
+ */
+
 public class Sistema {
 
     private static List<Tester> listaTesters = new ArrayList<>();
@@ -92,7 +98,6 @@ public class Sistema {
             System.out.println(NUM_INVALIDO_MSG);
             return;
         }
-        scanner.nextLine();
         System.out.println("Ingrese años de experiencia del tester:");
         int aniosExperiencia;
         try {
@@ -101,7 +106,6 @@ public class Sistema {
             System.out.println(NUM_INVALIDO_MSG);
             return;
         }
-        scanner.nextLine();
         if (edad < 0 || aniosExperiencia < 0) {
             System.out.println("Los valores deben ser positivos");
             return;
@@ -140,7 +144,7 @@ public class Sistema {
         char[][] matrizParticular = new char[8][10];
         for (int i = 0; i < 8; i++) {
             System.out.println("Ingrese la fila " + (i + 1) + " del tablero particular:");
-            String fila = scanner.nextLine();
+            String fila = scanner.nextLine().trim().toUpperCase();
             if (!fila.matches("[BNV]{10}")) {
                 System.out.println(FILA_INVALIDA_MSG);
                 i--;
@@ -168,7 +172,6 @@ public class Sistema {
             System.out.println(NUM_INVALIDO_MSG);
             return;
         }
-        scanner.nextLine();
         if (testerElegidoInt < 1 || testerElegidoInt > listaTesters.size()) {
             System.out.println("Número de tester inválido");
             return;
@@ -183,13 +186,12 @@ public class Sistema {
             System.out.println(NUM_INVALIDO_MSG);
             return;
         }
-        scanner.nextLine();
         if (casoElegido <= 0 || casoElegido > 5) {
             System.out.println("Caso elegido inválido");
             return;
         }
         List<String> parametros = pedirParametrosCaso(casoElegido);
-        if (parametros.isEmpty()) {
+        if (casoElegido != 4 && parametros.isEmpty()) {
             return;
         }
         System.out.println("Ingrese comentario:");
@@ -198,8 +200,18 @@ public class Sistema {
         String resultado = ejecutarCaso(casoElegido, parametros);
         Testeo testRealizado = new Testeo(casoElegido, parametros, comentario, resultado);
         testRealizado.setMatrizOriginal(matrizOriginal);
-        if ((casoElegido == 2 || casoElegido == 3) && resultado.equals("true")) {
-            testRealizado.setMatrizResultante(tableroActual.getMatriz());
+        System.out.println("Resultado:");
+        System.out.println(resultado);
+        if (casoElegido == 2 || casoElegido == 3) {
+            if (resultado.equals("true")) {
+                testRealizado.setMatrizResultante(tableroActual.getMatriz());
+                System.out.println("Matriz modificada:");
+                System.out.println(tableroActual.prepararTablero());
+            } else {
+                System.out.println("Movimiento inválido. La matriz no fue modificada.");
+                System.out.println("Matriz actual:");
+                System.out.println(tableroActual.prepararTablero());
+            }
         }
         testerElegidoObj.agregarTesteo(testRealizado);
     }
@@ -275,7 +287,6 @@ public class Sistema {
             System.out.println(NUM_INVALIDO_MSG);
             return;
         }
-        scanner.nextLine();
         if (testerElegidoInt < 1 || testerElegidoInt > listaTesters.size()) {
             System.out.println("Número de tester inválido");
             return;
@@ -295,7 +306,6 @@ public class Sistema {
             System.out.println(NUM_INVALIDO_MSG);
             return;
         }
-        scanner.nextLine();
         String testeo = testerElegido.obtenerTesteoPorNumero(numeroTesteo);
         System.out.println(testeo);
     }

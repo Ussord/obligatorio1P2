@@ -7,6 +7,12 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Autores:
+ * Mauro Russo - 300185
+ * Valeria Otegui - 281674
+ */
+
 public class Tester {
 
     private final String nombre;
