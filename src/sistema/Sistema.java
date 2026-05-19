@@ -37,7 +37,7 @@ public class Sistema {
         System.out.println("Trabajo desarrollado por:");
         System.out.println("Mauro Russo 300185");
         System.out.println("Valeria Otegui 281674");
-        String opcionStr = "";
+        String opcionStr;
         do {
             System.out.println("\n=== MENU ===");
             System.out.println("a) Registrar tester");

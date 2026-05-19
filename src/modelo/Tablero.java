@@ -8,10 +8,12 @@ import java.util.Arrays;
 
 public class Tablero {
 
-    private char[][] matriz = new char[8][10];
+    private final char[][] matriz;
 
     public Tablero() {
-        String[] filas = {
+        this.matriz = new char[8][10];
+        String[] filas;
+        filas = new String[]{
             "VVNNVVNNVV",
             "NNNNNNNNNN",
             "NNVVNNVVNN",
@@ -29,6 +31,7 @@ public class Tablero {
     }
 
     public Tablero(char[][] matriz) {
+        this.matriz = new char[8][10];
         for (int i = 0; i < matriz.length; i++) {
             this.matriz[i] = Arrays.copyOf(matriz[i], matriz[i].length);
         }
