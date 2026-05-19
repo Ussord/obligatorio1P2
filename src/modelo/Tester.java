@@ -9,10 +9,10 @@ import java.util.List;
 
 public class Tester {
     
-    private String nombre;
-    private int edad;
-    private int aniosExperiencia;
-    private List<Testeo> listaTesteos;
+    private final String nombre;
+    private final int edad;
+    private final int aniosExperiencia;
+    private final List<Testeo> listaTesteos;
     
     public Tester(String nombre, int edad, int aniosExperiencia) {
         this.nombre = nombre;

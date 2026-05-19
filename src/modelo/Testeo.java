@@ -10,13 +10,13 @@ import java.util.Arrays;
 public class Testeo {
     
     private static int contador = 0;
-    private int numero;
-    private int caso;
-    private List<String> parametros;
-    private String comentario;
-    private String resultado;
-    private char[][] matrizOriginal = new char[8][10];
-    private char[][] matrizResultante = new char[8][10];
+    private final int numero;
+    private final int caso;
+    private final List<String> parametros;
+    private final String comentario;
+    private final String resultado;
+    private final char[][] matrizOriginal = new char[8][10];
+    private final char[][] matrizResultante = new char[8][10];
 
     public Testeo (int caso, List<String> parametros, String comentario, String resultado) {
         this.numero = ++contador;
