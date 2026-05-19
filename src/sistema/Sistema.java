@@ -17,12 +17,15 @@ public class Sistema {
 
     private static List<Tester> listaTesters;
     private static Tablero tableroActual;
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
     private static final Set<String> COLORES_VALIDOS = new HashSet<>(Arrays.asList("B", "N"));
     private static final Set<String> FORMAS_VALIDAS = new HashSet<>(Arrays.asList("H", "V"));
     private static final Set<String> SENTIDOS_INDIVIDUALES = new HashSet<>(Arrays.asList("N", "S", "E", "O", "NE", "NO", "SE", "SO"));
     private static final Set<String> SENTIDOS_GRUPO = new HashSet<>(Arrays.asList("N", "S", "E", "O"));
     private static final Map<String, Set<String>> SENTIDOS_POR_COLOR = new HashMap<>();
+    private static final String COLOR_MSG = "Ingrese color (B/N):";
+    private static final String COLOR_INVALIDO_MSG = "Color inválido";
+    private static final String PASOS_REGEX = "[1-9]";
 
     static {
         SENTIDOS_POR_COLOR.put("B", new HashSet<>(Arrays.asList("N", "NE", "NO", "E", "O")));
@@ -133,12 +136,13 @@ public class Sistema {
         }
         System.out.println("Elija un tester:");
         System.out.println(desplegarListaTesters());
-        int testerElegido = scanner.nextInt();
+        int testerElegidoInt = scanner.nextInt();
         scanner.nextLine();
-        if (testerElegido < 1 || testerElegido > listaTesters.size()) {
+        if (testerElegidoInt < 1 || testerElegidoInt > listaTesters.size()) {
             System.out.println("Numero de tester no existente");
             return;
         }
+        Tester testerElegidoObj = listaTesters.get(testerElegidoInt - 1);
         System.out.println("Elija un caso:");
         System.out.println(desplegarCasos());
         int casoElegido = scanner.nextInt();
@@ -160,7 +164,7 @@ public class Sistema {
         if ((casoElegido == 2 || casoElegido == 3) && resultado.equals("true")) {
             testRealizado.setMatrizResultante(tableroActual.getMatriz());
         }
-
+        testerElegidoObj.agregarTesteo(testRealizado);
     }
 
     private static List<String> pedirParametrosCaso(int caso) {
@@ -186,15 +190,17 @@ public class Sistema {
 
     private static String ejecutarCaso(int caso, List<String> parametros) {
         switch (caso) {
-            case 1:
+            case 1 -> {
                 return String.valueOf(tableroActual.contarFichas(parametros.get(0).charAt(0)));
-            case 2:
+            }
+            case 2 -> {
                 return String.valueOf(tableroActual.validarMovimientoIndividual(parametros.get(0).charAt(0),
                         parametros.get(1),
                         Integer.parseInt(parametros.get(2)),
                         Integer.parseInt(parametros.get(3)),
                         Integer.parseInt(parametros.get(4))));
-            case 3:
+            }
+            case 3 -> {
                 return String.valueOf(tableroActual.validarMovimientoEnGrupo(
                         parametros.get(0).charAt(0),
                         parametros.get(1),
@@ -203,23 +209,72 @@ public class Sistema {
                         Integer.parseInt(parametros.get(4)),
                         Integer.parseInt(parametros.get(5)),
                         Integer.parseInt(parametros.get(6))));
-            case 4:
+            }
+            case 4 -> {
                 return tableroActual.prepararTablero();
-            case 5:
+            }
+            case 5 -> {
                 return String.valueOf(
                         tableroActual
                                 .verificarConexion(parametros.get(0).charAt(0)));
-            default:
+            }
+            default ->
                 throw new AssertionError();
         }
     }
 
+    @SuppressWarnings("java:S106")
     private static void consultarTester() {
-
+        if (listaTesters.isEmpty()) {
+            System.out.println("No existen testers registrados.");
+            return;
+        }
+        System.out.println("Elija un tester:");
+        System.out.println(desplegarListaTesters());
+        int testerElegidoInt = scanner.nextInt();
+        scanner.nextLine();
+        if (testerElegidoInt < 1 || testerElegidoInt > listaTesters.size()) {
+            System.out.println("Numero de tester no existente");
+            return;
+        }
+        Tester testerElegido = listaTesters.get(testerElegidoInt - 1);
+        if (testerElegido.obtenerCantidadTesteos() == 0) {
+            System.out.println("El tester no tiene testeos registrados.");
+            return;
+        }
+        System.out.println("Testeos de " + testerElegido.getNombre() + ":");
+        System.out.println(testerElegido.obtenerListaResumidaTesteos());
+        System.out.println("Ingrese numero de testeo:");
+        int numeroTesteo = scanner.nextInt();
+        scanner.nextLine();
+        String testeo = testerElegido.obtenerTesteoPorNumero(numeroTesteo);
+        System.out.println(testeo);
     }
-
+    
+    @SuppressWarnings("java:S106")
     private static void mostrarEstadisticas() {
-
+        if (listaTesters.isEmpty()) {
+            System.out.println("No existen testers registrados.");
+            return;
+        }
+        int maximo = 0;
+        for (Tester tester : listaTesters) {
+            if (tester.obtenerCantidadTesteos() > maximo) {
+                maximo = tester.obtenerCantidadTesteos();
+            }
+        }
+        System.out.println("Testers con mayor cantidad de testeos (" + maximo + "):");
+        for (Tester tester : listaTesters) {
+            if (tester.obtenerCantidadTesteos() == maximo) {
+                System.out.println("- " + tester.getNombre());
+            }
+        }
+        System.out.println("Testers sin testeos:");
+        for (Tester tester : listaTesters) {
+            if (tester.obtenerCantidadTesteos() == 0) {
+                System.out.println("- " + tester.getNombre());
+            }
+        }
     }
 
     private static String desplegarListaTesters() {
@@ -245,10 +300,10 @@ public class Sistema {
 
     @SuppressWarnings("java:S106")
     private static List<String> pedirParametrosCaso1Y5(List<String> parametros) {
-        System.out.println("Ingrese color (B/N):");
+        System.out.println(COLOR_MSG);
         String color = scanner.nextLine().trim().toUpperCase();
         if (!COLORES_VALIDOS.contains(color)) {
-            System.out.println("Color inválido");
+            System.out.println(COLOR_INVALIDO_MSG);
             return new ArrayList<>();
         }
         parametros.add(color);
@@ -257,10 +312,10 @@ public class Sistema {
 
     @SuppressWarnings("java:S106")
     private static List<String> pedirParametrosCaso2(List<String> parametros) {
-        System.out.println("Ingrese color (B/N):");
+        System.out.println(COLOR_MSG);
         String color = scanner.nextLine().trim().toUpperCase();
         if (!COLORES_VALIDOS.contains(color)) {
-            System.out.println("Color inválido");
+            System.out.println(COLOR_INVALIDO_MSG);
             return new ArrayList<>();
         }
         parametros.add(color);
@@ -291,7 +346,7 @@ public class Sistema {
         parametros.add(columna);
         System.out.println("Ingrese pasos:");
         String pasos = scanner.nextLine().trim();
-        if (!pasos.matches("[1-9]")) {
+        if (!pasos.matches(PASOS_REGEX)) {
             System.out.println("Pasos inválidos");
             return new ArrayList<>();
         }
@@ -301,10 +356,10 @@ public class Sistema {
 
     @SuppressWarnings("java:S106")
     private static List<String> pedirParametrosCaso3(List<String> parametros) {
-        System.out.println("Ingrese color (B/N):");
+        System.out.println(COLOR_MSG);
         String color = scanner.nextLine().trim().toUpperCase();
         if (!COLORES_VALIDOS.contains(color)) {
-            System.out.println("Color inválido");
+            System.out.println(COLOR_INVALIDO_MSG);
             return new ArrayList<>();
         }
         parametros.add(color);
@@ -342,14 +397,14 @@ public class Sistema {
         parametros.add(columna);
         System.out.println("Ingrese tamaño:");
         String tamanio = scanner.nextLine().trim();
-        if (!tamanio.matches("[1-9]")) {
+        if (!tamanio.matches(PASOS_REGEX)) {
             System.out.println("Tamaño inválido");
             return new ArrayList<>();
         }
         parametros.add(tamanio);
         System.out.println("Ingrese pasos:");
         String pasos = scanner.nextLine().trim();
-        if (!pasos.matches("[1-9]")) {
+        if (!pasos.matches(PASOS_REGEX)) {
             System.out.println("Pasos inválidos");
             return new ArrayList<>();
         }
