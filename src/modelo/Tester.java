@@ -8,35 +8,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tester {
-    
+
     private final String nombre;
     private final int edad;
     private final int aniosExperiencia;
     private final List<Testeo> listaTesteos;
-    
+
     public Tester(String nombre, int edad, int aniosExperiencia) {
         this.nombre = nombre;
         this.edad = edad;
         this.aniosExperiencia = aniosExperiencia;
         listaTesteos = new ArrayList<>();
     }
-    
+
     public String getNombre() {
         return nombre;
     }
-    
+
     public int getEdad() {
         return edad;
     }
-    
+
     public int getAniosExperiencia() {
         return aniosExperiencia;
     }
-    
+
     public String obtenerListaResumidaTesteos() {
         StringBuilder testeosResumidos = new StringBuilder();
         for (int i = 0; i < listaTesteos.size(); i++) {
-            testeosResumidos.append("Numero: ")
+            testeosResumidos.append("Número: ")
                     .append(listaTesteos.get(i).getNumero())
                     .append(" Caso: ")
                     .append(listaTesteos.get(i).getCaso())
@@ -44,7 +44,7 @@ public class Tester {
         }
         return testeosResumidos.toString();
     }
-    
+
     public String obtenerTesteoPorNumero(int numero) {
         for (int i = 0; i < listaTesteos.size(); i++) {
             if (listaTesteos.get(i).getNumero() == numero) {
@@ -53,15 +53,15 @@ public class Tester {
         }
         return "No existe";
     }
-    
+
     public int obtenerCantidadTesteos() {
         return listaTesteos.size();
     }
-    
+
     public void agregarTesteo(Testeo t) {
         listaTesteos.add(t);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder texto = new StringBuilder();
@@ -78,7 +78,7 @@ public class Tester {
                 .append(prepararTesteos(listaTesteos));
         return texto.toString();
     }
-    
+
     private String prepararTesteos(List<Testeo> listaTesteos) {
         StringBuilder testeosPreparados = new StringBuilder();
         for (int i = 0; i < listaTesteos.size(); i++) {
@@ -86,5 +86,5 @@ public class Tester {
         }
         return testeosPreparados.toString();
     }
-    
+
 }

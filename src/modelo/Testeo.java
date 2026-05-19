@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Arrays;
 
 public class Testeo {
-    
+
     private static int contador = 0;
     private final int numero;
     private final int caso;
@@ -18,7 +18,7 @@ public class Testeo {
     private final char[][] matrizOriginal = new char[8][10];
     private final char[][] matrizResultante = new char[8][10];
 
-    public Testeo (int caso, List<String> parametros, String comentario, String resultado) {
+    public Testeo(int caso, List<String> parametros, String comentario, String resultado) {
         this.numero = ++contador;
         this.caso = caso;
         this.parametros = parametros;
@@ -83,7 +83,7 @@ public class Testeo {
                 .append("Caso: ")
                 .append(caso)
                 .append("\n")
-                .append("Parametros: ")
+                .append("Parámetros: ")
                 .append(prepararParametros(parametros))
                 .append("\n")
                 .append("Comentario: ")

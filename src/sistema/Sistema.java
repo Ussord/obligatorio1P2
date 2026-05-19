@@ -15,8 +15,8 @@ import java.util.Arrays;
 
 public class Sistema {
 
-    private static List<Tester> listaTesters;
-    private static Tablero tableroActual;
+    private static List<Tester> listaTesters = new ArrayList<>();
+    private static Tablero tableroActual = new Tablero();
     private static final Scanner scanner = new Scanner(System.in);
     private static final Set<String> COLORES_VALIDOS = new HashSet<>(Arrays.asList("B", "N"));
     private static final Set<String> FORMAS_VALIDAS = new HashSet<>(Arrays.asList("H", "V"));
@@ -26,6 +26,10 @@ public class Sistema {
     private static final String COLOR_MSG = "Ingrese color (B/N):";
     private static final String COLOR_INVALIDO_MSG = "Color inválido";
     private static final String PASOS_REGEX = "[1-9]";
+    private static final String SIN_TESTERS_MSG = "No existen testers registrados.";
+    private static final String NUM_INVALIDO_MSG = "Debe ingresar un número válido.";
+    private static final String FILA_INVALIDA_MSG = "Fila inválida";
+    private static final String OPCION_INVALIDA_MSG = "Opción inválida";
 
     static {
         SENTIDOS_POR_COLOR.put("B", new HashSet<>(Arrays.asList("N", "NE", "NO", "E", "O")));
@@ -34,6 +38,11 @@ public class Sistema {
 
     @SuppressWarnings("java:S106")
     public static void main(String[] args) {
+        try {
+            System.setOut(new java.io.PrintStream(System.out, true, java.nio.charset.StandardCharsets.UTF_8.name()));
+        } catch (java.io.UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         System.out.println("Trabajo desarrollado por:");
         System.out.println("Mauro Russo 300185");
         System.out.println("Valeria Otegui 281674");
@@ -62,27 +71,43 @@ public class Sistema {
                 case "f" ->
                     System.out.println("Hasta luego");
                 default ->
-                    System.out.println("Opción inválida");
+                    System.out.println(OPCION_INVALIDA_MSG);
             }
         } while (!opcionStr.equals("f"));
     }
 
     @SuppressWarnings("java:S106")
     private static void registrarTester() {
-        System.out.println("Ingrese nombre del tester");
+        System.out.println("Ingrese nombre del tester:");
         String nombre = scanner.nextLine().trim();
         if (listaTesters.stream().anyMatch(t -> t.getNombre().equalsIgnoreCase(nombre))) {
             System.out.println("Ya existe un tester con este nombre");
             return;
         }
-        System.out.println("Ingrese edad del tester");
-        int edad = scanner.nextInt();
+        System.out.println("Ingrese edad del tester:");
+        int edad;
+        try {
+            edad = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println(NUM_INVALIDO_MSG);
+            return;
+        }
         scanner.nextLine();
-        System.out.println("Ingrese anios de experiencia del tester");
-        int aniosExperiencia = scanner.nextInt();
+        System.out.println("Ingrese años de experiencia del tester:");
+        int aniosExperiencia;
+        try {
+            aniosExperiencia = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println(NUM_INVALIDO_MSG);
+            return;
+        }
         scanner.nextLine();
         if (edad < 0 || aniosExperiencia < 0) {
             System.out.println("Los valores deben ser positivos");
+            return;
+        }
+        if (aniosExperiencia >= edad) {
+            System.out.println("El tester no puede tener mas años de experiencia que de edad");
             return;
         }
         listaTesters.add(new Tester(nombre, edad, aniosExperiencia));
@@ -93,7 +118,7 @@ public class Sistema {
     private static void registrarMatriz() {
         System.out.println("El tablero actual es:");
         System.out.println(tableroActual.prepararTablero());
-        System.out.println("Desea cambiarla? S/N");
+        System.out.println("Desea cambiarla? (S/N)");
         String cambia = scanner.nextLine().trim();
         if (cambia.equalsIgnoreCase("S")) {
             System.out.println("Desea utilizar el tablero por defecto? S/N");
@@ -103,10 +128,10 @@ public class Sistema {
             } else if (eligeDefaul.equalsIgnoreCase("N")) {
                 tableroActual = new Tablero(leerMatrizParticular());
             } else {
-                System.out.println("Respuesta incorrecta");
+                System.out.println(OPCION_INVALIDA_MSG);
             }
         } else if (!cambia.equalsIgnoreCase("N")) {
-            System.out.println("Respuesta incorrecta");
+            System.out.println(OPCION_INVALIDA_MSG);
         }
     }
 
@@ -117,7 +142,7 @@ public class Sistema {
             System.out.println("Ingrese la fila " + (i + 1) + " del tablero particular:");
             String fila = scanner.nextLine();
             if (!fila.matches("[BNV]{10}")) {
-                System.out.println("Fila mal ingresada");
+                System.out.println(FILA_INVALIDA_MSG);
                 i--;
             } else {
                 for (int j = 0; j < 10; j++) {
@@ -131,24 +156,36 @@ public class Sistema {
     @SuppressWarnings("java:S106")
     private static void registrarTesteo() {
         if (listaTesters.isEmpty()) {
-            System.out.println("No existen testers registrados.");
+            System.out.println(SIN_TESTERS_MSG);
             return;
         }
         System.out.println("Elija un tester:");
         System.out.println(desplegarListaTesters());
-        int testerElegidoInt = scanner.nextInt();
+        int testerElegidoInt;
+        try {
+            testerElegidoInt = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println(NUM_INVALIDO_MSG);
+            return;
+        }
         scanner.nextLine();
         if (testerElegidoInt < 1 || testerElegidoInt > listaTesters.size()) {
-            System.out.println("Numero de tester no existente");
+            System.out.println("Número de tester inválido");
             return;
         }
         Tester testerElegidoObj = listaTesters.get(testerElegidoInt - 1);
         System.out.println("Elija un caso:");
         System.out.println(desplegarCasos());
-        int casoElegido = scanner.nextInt();
+        int casoElegido;
+        try {
+            casoElegido = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println(NUM_INVALIDO_MSG);
+            return;
+        }
         scanner.nextLine();
         if (casoElegido <= 0 || casoElegido > 5) {
-            System.out.println("Caso elegido no existente");
+            System.out.println("Caso elegido inválido");
             return;
         }
         List<String> parametros = pedirParametrosCaso(casoElegido);
@@ -226,15 +263,21 @@ public class Sistema {
     @SuppressWarnings("java:S106")
     private static void consultarTester() {
         if (listaTesters.isEmpty()) {
-            System.out.println("No existen testers registrados.");
+            System.out.println(SIN_TESTERS_MSG);
             return;
         }
         System.out.println("Elija un tester:");
         System.out.println(desplegarListaTesters());
-        int testerElegidoInt = scanner.nextInt();
+        int testerElegidoInt;
+        try {
+            testerElegidoInt = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println(NUM_INVALIDO_MSG);
+            return;
+        }
         scanner.nextLine();
         if (testerElegidoInt < 1 || testerElegidoInt > listaTesters.size()) {
-            System.out.println("Numero de tester no existente");
+            System.out.println("Número de tester inválido");
             return;
         }
         Tester testerElegido = listaTesters.get(testerElegidoInt - 1);
@@ -245,16 +288,22 @@ public class Sistema {
         System.out.println("Testeos de " + testerElegido.getNombre() + ":");
         System.out.println(testerElegido.obtenerListaResumidaTesteos());
         System.out.println("Ingrese numero de testeo:");
-        int numeroTesteo = scanner.nextInt();
+        int numeroTesteo;
+        try {
+            numeroTesteo = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println(NUM_INVALIDO_MSG);
+            return;
+        }
         scanner.nextLine();
         String testeo = testerElegido.obtenerTesteoPorNumero(numeroTesteo);
         System.out.println(testeo);
     }
-    
+
     @SuppressWarnings("java:S106")
     private static void mostrarEstadisticas() {
         if (listaTesters.isEmpty()) {
-            System.out.println("No existen testers registrados.");
+            System.out.println(SIN_TESTERS_MSG);
             return;
         }
         int maximo = 0;
@@ -333,7 +382,7 @@ public class Sistema {
         System.out.println("Ingrese fila:");
         String fila = scanner.nextLine().trim();
         if (!fila.matches("[0-7]")) {
-            System.out.println("Fila inválida");
+            System.out.println(FILA_INVALIDA_MSG);
             return new ArrayList<>();
         }
         parametros.add(fila);
@@ -384,7 +433,7 @@ public class Sistema {
         System.out.println("Ingrese fila:");
         String fila = scanner.nextLine().trim();
         if (!fila.matches("[0-7]")) {
-            System.out.println("Fila inválida");
+            System.out.println(FILA_INVALIDA_MSG);
             return new ArrayList<>();
         }
         parametros.add(fila);
